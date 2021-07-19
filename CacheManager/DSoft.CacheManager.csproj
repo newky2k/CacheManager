@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>DSoft.snk</AssemblyOriginatorKeyFile>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Copyright>Copyright © 2021 DSoft</Copyright>
+    <Authors>newky2k</Authors>
+    <PackageId>DSoft.CacheManager</PackageId>
+    <Product>DSoft.CacheManager</Product>
+    <PackageProjectUrl>https://github.com/newky2k/cachemanager</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/newky2k/cachemanager</RepositoryUrl>
+    <RepositoryType>Github</RepositoryType>
+    <PackageTags>cache netstandard</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="LiteDB.Config" Version="5.0.7" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="5.0.0" />
+  </ItemGroup>
+
+</Project>
