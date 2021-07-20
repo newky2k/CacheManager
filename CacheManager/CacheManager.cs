@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace DSoft.CacheManager
 {
-    internal class CacheManager : ICacheManager
+    public class CacheManager : ICacheManager
     {
         private const string CacheItemCollectionName = "CacheItems";
 
