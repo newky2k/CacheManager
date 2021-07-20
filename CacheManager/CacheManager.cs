@@ -308,7 +308,7 @@ namespace DSoft.CacheManager
 
                 var items = new CacheManagerItemCollection();
 
-                if (!File.Exists(DatabaseFileName))
+                if (!File.Exists(StoragePath))
                     return items;
 
                 //load the keys into memory, other items can be loaded as an when
