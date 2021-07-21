@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace CacheManager
+namespace DSoft.CacheManager
 {
-    public interface ICacheManager
+    public interface ICacheManager : IDisposable
     {
         bool IsKeyRegistered(string key);
 

@@ -5,6 +5,10 @@ VisualStudioVersion = 16.0.31424.327
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DSoft.CacheManager", "CacheManager\DSoft.CacheManager.csproj", "{B6D28558-1417-4C83-9189-F81143759A95}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DSoft.CacheManager.LiteDB", "DSoft.CacheManager.LiteDB\DSoft.CacheManager.LiteDB.csproj", "{5E61C308-8F59-49B4-ACA5-AA9DE69358F1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheManagerTest", "CacheManagerTest\CacheManagerTest.csproj", "{2D4DB4E8-9646-4133-884E-30D737FF3CCF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{B6D28558-1417-4C83-9189-F81143759A95}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B6D28558-1417-4C83-9189-F81143759A95}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B6D28558-1417-4C83-9189-F81143759A95}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E61C308-8F59-49B4-ACA5-AA9DE69358F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E61C308-8F59-49B4-ACA5-AA9DE69358F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E61C308-8F59-49B4-ACA5-AA9DE69358F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E61C308-8F59-49B4-ACA5-AA9DE69358F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D4DB4E8-9646-4133-884E-30D737FF3CCF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D4DB4E8-9646-4133-884E-30D737FF3CCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D4DB4E8-9646-4133-884E-30D737FF3CCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D4DB4E8-9646-4133-884E-30D737FF3CCF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
