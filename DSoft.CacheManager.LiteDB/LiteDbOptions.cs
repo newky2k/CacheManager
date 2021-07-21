@@ -4,6 +4,9 @@ using System.Text;
 
 namespace DSoft.CacheManager.LiteDB
 {
+    /// <summary>
+    /// Options for the LiteDBBackend
+    /// </summary>
     public class LiteDbStorageOptions
     {
         /// <summary>
