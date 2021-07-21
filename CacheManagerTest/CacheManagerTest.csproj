@@ -7,7 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="DSoft.System.Mvvm.Hosting" Version="2.3.2107.201" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\CacheManager\DSoft.CacheManager.csproj" />
+    <ProjectReference Include="..\DSoft.CacheManager.LiteDB\DSoft.CacheManager.LiteDB.csproj" />
   </ItemGroup>
 
 </Project>

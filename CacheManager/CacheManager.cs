@@ -1,6 +1,4 @@
-﻿using DSoft.CacheManager.LiteDB;
-using Microsoft.Extensions.Options;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -14,19 +12,17 @@ namespace DSoft.CacheManager
         private const string CacheItemCollectionName = "CacheItems";
 
         #region Fields
-        private CacheConfiguration _configuration;
         private CacheManagerItemCollection _cachedItems;
         private bool _isLoaded;
         private Dictionary<string, object> _dataDictionary = new Dictionary<string, object>();
         private object getItemLock = new object();
-        private IStorageBackend _backend;
+        private ICacheStorageBackend _backend;
 
         #endregion
 
         #region Properties
 
         #region Private Properties
-        private CacheConfiguration Configuration => _configuration;
 
         private CacheManagerItemCollection Cache
         {
@@ -48,16 +44,14 @@ namespace DSoft.CacheManager
             }
         }
 
-        private string BasePath => _configuration.Location;
 
-        private string StoragePath => Path.Combine(BasePath, Configuration.FileName);
-
-        private IStorageBackend BackEnd
+        private ICacheStorageBackend BackEnd
         {
             get
             {
                 if (_backend == null)
-                    _backend = new LiteDbBackend() { FileName = Configuration.FileName, Location = _configuration.Location, Password = Configuration.Password };
+                    throw new Exception("No backend has been provided");
+                    
 
                 return _backend;
             }
@@ -69,15 +63,13 @@ namespace DSoft.CacheManager
 
         #region Constructors
 
-        public CacheManager(CacheConfiguration configuration)
+        public CacheManager(ICacheStorageBackend backEndProvider)
         {
-            _configuration = configuration;
+            _backend = backEndProvider;
+
+            _backend.Prepare();
         }
 
-        public CacheManager(IOptions<CacheConfiguration> options) : this(options.Value)
-        {
-
-        }
 
         #endregion
 
@@ -92,6 +84,17 @@ namespace DSoft.CacheManager
         /// </returns>
         public bool IsKeyRegistered(string key) => Cache.ContainsKey(key);
 
+        /// <summary>
+        /// Gets the items for the cache
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key">The cache key</param>
+        /// <returns></returns>
+        /// <exception cref="Exception">
+        /// No data registered with key: {key} in the CacheManager
+        /// or
+        /// No data registered with key: {key} in the CacheManager
+        /// </exception>
         public List<T> GetItems<T>(string key)
         {
             if (!Cache.ContainsKey(key))
@@ -196,20 +199,7 @@ namespace DSoft.CacheManager
 
         }
 
-        public void ResetCache()
-        {
-            try
-            {
-                if (File.Exists(StoragePath))
-                    File.Delete(StoragePath);
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-        }
-
+        public void ResetCache() => BackEnd.Reset();
 
         #endregion
 
@@ -286,12 +276,10 @@ namespace DSoft.CacheManager
             try
             {
 
-                if (!Directory.Exists(BasePath))
-                    Directory.CreateDirectory(BasePath);
-
+                
                 var items = new CacheManagerItemCollection();
 
-                if (!File.Exists(StoragePath))
+                if (!BackEnd.Exists)
                     return items;
 
                 //load the keys into memory, other items can be loaded as an when
@@ -307,8 +295,8 @@ namespace DSoft.CacheManager
                         {
                             var aType = Type.GetType(aKey.Type);
 
-                            var ex = typeof(IStorageBackend);
-                            var mi = ex.GetMethod(nameof(IStorageBackend.GetItems));
+                            var ex = typeof(ICacheStorageBackend);
+                            var mi = ex.GetMethod(nameof(ICacheStorageBackend.GetItems));
                             var miConstructed = mi.MakeGenericMethod(aType);
                             
                             var dList = (IList)miConstructed.Invoke(BackEnd, new object[] { aKey.Key });
@@ -385,7 +373,6 @@ namespace DSoft.CacheManager
         public void Dispose()
         {
             _backend = null;
-            _configuration = null;
         }
 
         #endregion

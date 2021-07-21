@@ -1,8 +1,11 @@
 ﻿using CacheManagerTest.Models;
+using DSoft.CacheManager;
+using DSoft.CacheManager.LiteDB;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Mvvm;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -27,16 +30,21 @@ namespace CacheManagerTest
             InitializeComponent();
         }
 
+
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            var options = new DSoft.CacheManager.CacheConfiguration()
-            {
-                Location = Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
-                FileName = "Settings.db",
-                Password = "1234567890",
-            };
 
-            using (var cacheManager = new DSoft.CacheManager.CacheManager(options))
+            
+            //var config = new LiteDbStorageOptions()
+            //{
+            //    Location = Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
+            //    FileName = "Settings.db",
+            //    Password = "1234567890",
+            //};
+
+            //var cacheBackend = new LiteDbBackend(config);
+
+            using (var cacheManager = ServiceHost.GetRequiredService<ICacheManager>())
             {
                 var dataKey = typeof(SomeData).Name;
                 var items = new List<SomeData>()
@@ -58,6 +66,10 @@ namespace CacheManagerTest
             }
         }
 
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            await ServiceHost.Host.StartAsync();
+        }
     }
     
 }

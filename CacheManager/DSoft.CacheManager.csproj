@@ -18,9 +18,4 @@
     <Description>.NET Managed Caching framework using LiteDb as backing storage</Description>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="LiteDB.Config" Version="5.0.7" />
-    <PackageReference Include="Microsoft.Extensions.Options" Version="5.0.0" />
-  </ItemGroup>
-
 </Project>

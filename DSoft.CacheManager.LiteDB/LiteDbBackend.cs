@@ -1,4 +1,5 @@
 ﻿using LiteDB;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,19 +8,22 @@ using System.Linq.Expressions;
 
 namespace DSoft.CacheManager.LiteDB
 {
-    public class LiteDbBackend : IStorageBackend
+    public class LiteDbBackend : ICacheStorageBackend
     {
+        #region Fields
+
+        
         private LiteDatabase _liteDatabase = null;
+        private LiteDbStorageOptions _config = null;
 
-        public string Location { get; set; }
+        #endregion
 
-        public string FileName { get; set; }
+        #region Properties
 
-        public string Password { get; set; }
 
-        private string StoragePath => Path.Combine(Location, FileName);
+        public string StoragePath => Path.Combine(_config.Location, _config.FileName);
 
-        private ConnectionString DatabaseConnectionString => new ConnectionString($"Filename={StoragePath};Password={Password}");
+        private ConnectionString DatabaseConnectionString => new ConnectionString($"Filename={StoragePath};Password={_config.Password}");
 
         public LiteDatabase Database
         {
@@ -32,6 +36,23 @@ namespace DSoft.CacheManager.LiteDB
             }
         }
 
+        public bool Exists => File.Exists(StoragePath);
+
+        #endregion
+
+        #region Constructors
+
+        public LiteDbBackend(LiteDbStorageOptions config)
+        {
+            _config = config;
+        }
+
+        public LiteDbBackend(IOptions<LiteDbStorageOptions> config) : this(config.Value)
+        {
+
+        }
+
+        #endregion
         public bool CacheEntryExists(string keyName) => Database.CollectionExists(keyName);
 
         public IList<T> GetItems<T>(string keyName)
@@ -91,12 +112,35 @@ namespace DSoft.CacheManager.LiteDB
 
         public void SetItems<T>(string keyName, List<T> data)
         {
-            if (!CacheEntryExists(keyName))
+            if (CacheEntryExists(keyName))
                 Database.DropCollection(keyName);
 
             var ccol = Database.GetCollection<T>(keyName);
 
             ccol.InsertBulk(data);
+        }
+
+        public void Prepare()
+        {
+            if (!Directory.Exists(_config.Location))
+                Directory.CreateDirectory(_config.Location);
+
+
+
+        }
+
+        public void Reset()
+        {
+            try
+            {
+                if (File.Exists(StoragePath))
+                    File.Delete(StoragePath);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
     }
 }

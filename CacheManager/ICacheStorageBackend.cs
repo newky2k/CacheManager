@@ -1,5 +1,4 @@
-﻿using LiteDB;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq.Expressions;
@@ -7,8 +6,10 @@ using System.Text;
 
 namespace DSoft.CacheManager
 {
-    public interface IStorageBackend
+    public interface ICacheStorageBackend
     {
+        bool Exists { get; }
+
         /// <summary>
         /// Does the cache exist in the storage backend
         /// </summary>
@@ -28,5 +29,9 @@ namespace DSoft.CacheManager
 
         void SetItems<T>(string keyName, List<T> data);
 
+
+        void Prepare();
+
+        void Reset();
     }
 }
