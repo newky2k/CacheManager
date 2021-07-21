@@ -85,7 +85,7 @@ namespace DSoft.CacheManager
         public bool IsKeyRegistered(string key) => Cache.ContainsKey(key);
 
         /// <summary>
-        /// Gets the items for the cache
+        /// Gets the items from the cache for the specified cache key
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="key">The cache key</param>
@@ -124,6 +124,13 @@ namespace DSoft.CacheManager
             return (List<T>)_dataDictionary[key];
         }
 
+        /// <summary>
+        /// Set the cached items for the specified cache key
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key">The key.</param>
+        /// <param name="content">The content.</param>
+        /// <param name="lastUpdated">The last updated.</param>
         public void SetItems<T>(string key, List<T> content, DateTime? lastUpdated = null)
         {
              var dTime = lastUpdated.HasValue ? lastUpdated : DateTime.Now;
@@ -149,6 +156,12 @@ namespace DSoft.CacheManager
 
         }
 
+        /// <summary>
+        /// Gets the last updated timestamp for the specified cache key
+        /// </summary>
+        /// <param name="key">The key.</param>
+        /// <returns></returns>
+        /// <exception cref="Exception">No data registered with key: {key} in the CacheManager</exception>
         public DateTime? GetLastUpdated(string key)
         {
             if (!Cache.ContainsKey(key))
@@ -158,6 +171,13 @@ namespace DSoft.CacheManager
 
         }
 
+        /// <summary>
+        /// Updates the cached item last updated timestamp, for the specified cache key
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key">The key.</param>
+        /// <param name="lastUpdated">The last updated.</param>
+        /// <exception cref="Exception">No data registered with key: {key} in the CacheManager</exception>
         public void UpdateContentsLastUpdated<T>(string key, DateTime? lastUpdated = null)
         {
             if (!Cache.ContainsKey(key))
@@ -170,6 +190,10 @@ namespace DSoft.CacheManager
             UpdateCacheKeys<T>(key, dTime.Value);
         }
 
+
+        /// <summary>
+        /// Loads the cache asynchronously.
+        /// </summary>
         public async Task LoadAsync()
         {
             await Task.Run(() =>
@@ -181,6 +205,9 @@ namespace DSoft.CacheManager
 
         }
 
+        /// <summary>
+        /// Syncronises the changes to the database, asynchronously.
+        /// </summary>
         public async Task SyncroniseAsync()
         {
             await Task.Run(() =>
@@ -199,6 +226,9 @@ namespace DSoft.CacheManager
 
         }
 
+        /// <summary>
+        /// Resets the cache
+        /// </summary>
         public void ResetCache() => BackEnd.Reset();
 
         #endregion

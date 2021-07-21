@@ -47,9 +47,9 @@ namespace DSoft.CacheManager.LiteDB
             _config = config;
         }
 
-        public LiteDbBackend(IOptions<LiteDbStorageOptions> config) : this(config.Value)
+        public LiteDbBackend(IOptions<LiteDbStorageOptions> config)
         {
-
+            _config = config.Value;
         }
 
         #endregion
@@ -124,9 +124,6 @@ namespace DSoft.CacheManager.LiteDB
         {
             if (!Directory.Exists(_config.Location))
                 Directory.CreateDirectory(_config.Location);
-
-
-
         }
 
         public void Reset()

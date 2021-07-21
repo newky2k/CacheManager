@@ -34,12 +34,14 @@ namespace CacheManagerTest
         private void ConfigureServices(IConfiguration configuration, IServiceCollection services)
         {
             services.AddScoped<ICacheManager, CacheManager>();
-            services.AddTransient<ICacheStorageBackend, LiteDbBackend>(x => new LiteDbBackend(new LiteDbStorageOptions()
+            services.AddTransient<ICacheStorageBackend, LiteDbBackend>();
+
+            services.AddOptions().Configure<LiteDbStorageOptions>(x =>
             {
-                Location = Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
-                FileName = "Settings.db",
-                Password = "1234567890",
-            }));
+                x.Location = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                x.FileName = "Settings.db";
+                x.Password = "1234567890";
+            });
 
 
 
