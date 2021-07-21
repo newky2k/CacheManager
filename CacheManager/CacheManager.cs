@@ -1,14 +1,10 @@
 ﻿using DSoft.CacheManager.LiteDB;
-using LiteDB;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DSoft.CacheManager
@@ -281,12 +277,8 @@ namespace DSoft.CacheManager
         {
             UpdateCacheKeys<T>(key, updateTime);
 
-            if (BackEnd.Database.CollectionExists(key))
-                BackEnd.Database.DropCollection(key);
+            BackEnd.SetItems<T>(key, content);
 
-            var ccol = BackEnd.Database.GetCollection<T>(key);
-            ccol.InsertBulk(content);
-            //Database.FileStorage.
         }
 
         private CacheManagerItemCollection LoadCache()

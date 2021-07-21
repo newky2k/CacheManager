@@ -88,5 +88,15 @@ namespace DSoft.CacheManager.LiteDB
 
             col.EnsureIndex(keySelector);
         }
+
+        public void SetItems<T>(string keyName, List<T> data)
+        {
+            if (!CacheEntryExists(keyName))
+                Database.DropCollection(keyName);
+
+            var ccol = Database.GetCollection<T>(keyName);
+
+            ccol.InsertBulk(data);
+        }
     }
 }

@@ -9,8 +9,6 @@ namespace DSoft.CacheManager
 {
     public interface IStorageBackend
     {
-        LiteDatabase Database { get; }
-
         /// <summary>
         /// Does the cache exist in the storage backend
         /// </summary>
@@ -28,6 +26,7 @@ namespace DSoft.CacheManager
 
         void EnsureIndexed<T, K>(string keyName, Expression<Func<T, K>> keySelector);
 
+        void SetItems<T>(string keyName, List<T> data);
 
     }
 }
