@@ -221,9 +221,7 @@ namespace DSoft.CacheManager
 
         private CacheManagerItem AddNewKey<T>(string key, DateTime updateTime)
         {
-            var col = BackEnd.Database.GetCollection<CacheManagerItem>(CacheItemCollectionName);
-
-            var existingItem = col.FindOne(x => x.Key.Equals(key));
+            var existingItem = BackEnd.Find<CacheManagerItem>(CacheItemCollectionName, x => x.Key.Equals(key));
 
             if (existingItem != null)
             {
@@ -231,7 +229,7 @@ namespace DSoft.CacheManager
                 existingItem.Type = typeof(T).AssemblyQualifiedName;
                 existingItem.ListType = typeof(List<T>).AssemblyQualifiedName;
 
-                col.Update(existingItem);
+                BackEnd.Update(CacheItemCollectionName, existingItem);
             }
             else
             {
@@ -244,10 +242,10 @@ namespace DSoft.CacheManager
                 };
 
 
-                col.Insert(existingItem);
+                BackEnd.Insert(CacheItemCollectionName, existingItem);
             }
 
-            col.EnsureIndex(x => x.Key);
+            BackEnd.EnsureIndexed<CacheManagerItem, string>(CacheItemCollectionName, x => x.Key);
 
             return existingItem;
 

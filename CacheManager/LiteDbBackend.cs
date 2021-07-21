@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace DSoft.CacheManager.LiteDB
 {
@@ -44,6 +45,48 @@ namespace DSoft.CacheManager.LiteDB
                 return new List<T>();
 
             return aCol.FindAll().ToList();
+        }
+
+        public T Find<T>(string keyName, Expression<Func<T, bool>> predicate)
+        {
+            if (!CacheEntryExists(keyName))
+                return default(T);
+
+            var col = Database.GetCollection<T>(keyName);
+
+            return col.FindOne(predicate);
+
+        }
+
+        public void Update<T>(string keyName, T data)
+        {
+            if (!CacheEntryExists(keyName))
+                return;
+
+            var col = Database.GetCollection<T>(keyName);
+
+            col.Update(data);
+        }
+
+        public void Insert<T>(string keyName, T data)
+        {
+            if (!CacheEntryExists(keyName))
+                return;
+
+            var col = Database.GetCollection<T>(keyName);
+
+            col.Insert(data);
+
+        }
+
+        public void EnsureIndexed<T, K>(string keyName, Expression<Func<T, K>> keySelector)
+        {
+            if (!CacheEntryExists(keyName))
+                return;
+
+            var col = Database.GetCollection<T>(keyName);
+
+            col.EnsureIndex(keySelector);
         }
     }
 }

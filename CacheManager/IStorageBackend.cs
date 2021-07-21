@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace DSoft.CacheManager
@@ -18,6 +19,15 @@ namespace DSoft.CacheManager
         bool CacheEntryExists(string keyName);
 
         IList<T> GetItems<T>(string keyName);
+
+        T Find<T>(string keyName, Expression<Func<T, bool>> predicate);
+
+        void Update<T>(string keyName, T data);
+
+        void Insert<T>(string keyName, T data);
+
+        void EnsureIndexed<T, K>(string keyName, Expression<Func<T, K>> keySelector);
+
 
     }
 }
