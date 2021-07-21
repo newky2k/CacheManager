@@ -159,7 +159,7 @@ namespace DSoft.CacheManager
 
         }
 
-        public void UpdateContentsLastUpdated(string key, DateTime? lastUpdated = null)
+        public void UpdateContentsLastUpdated<T>(string key, DateTime? lastUpdated = null)
         {
             if (!Cache.ContainsKey(key))
                 throw new Exception($"No data registered with key: {key} in the CacheManager");
@@ -168,7 +168,7 @@ namespace DSoft.CacheManager
 
             Cache[key].LastUpdated = dTime;
 
-            UpdateCacheKeys(key, dTime.Value);
+            UpdateCacheKeys<T>(key, dTime.Value);
         }
 
         public async Task LoadAsync()
@@ -251,18 +251,15 @@ namespace DSoft.CacheManager
 
         }
 
-        private void UpdateCacheKeys(string key, DateTime updateTime)
+        private void UpdateCacheKeys<T>(string key, DateTime updateTime)
         {
-            var col = BackEnd.Database.GetCollection<CacheManagerItem>(CacheItemCollectionName);
-
-
-            var existingItem = col.FindOne(x => x.Key.Equals(key));
+            var existingItem = BackEnd.Find<CacheManagerItem>(CacheItemCollectionName, x => x.Key.Equals(key));
 
             if (existingItem != null)
             {
                 existingItem.LastUpdated = updateTime;
 
-                col.Update(existingItem);
+                BackEnd.Update(CacheItemCollectionName, existingItem);
             }
             else
             {
@@ -270,17 +267,19 @@ namespace DSoft.CacheManager
                 {
                     Key = key,
                     LastUpdated = updateTime,
+                    Type = typeof(T).AssemblyQualifiedName,
+                    ListType = typeof(List<T>).AssemblyQualifiedName,
                 };
 
-                col.Insert(newKey);
+                BackEnd.Insert(CacheItemCollectionName, existingItem);
             }
 
-            col.EnsureIndex(x => x.Key);
+            BackEnd.EnsureIndexed<CacheManagerItem, string>(CacheItemCollectionName, x => x.Key);
         }
 
         private void UpdateStoredCache<T>(string key, List<T> content, DateTime updateTime)
         {
-            UpdateCacheKeys(key, updateTime);
+            UpdateCacheKeys<T>(key, updateTime);
 
             if (BackEnd.Database.CollectionExists(key))
                 BackEnd.Database.DropCollection(key);

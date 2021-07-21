@@ -14,7 +14,7 @@ namespace DSoft.CacheManager
 
         DateTime? GetLastUpdated(string key);
 
-        void UpdateContentsLastUpdated(string key, DateTime? lastUpdated = null);
+        void UpdateContentsLastUpdated<T>(string key, DateTime? lastUpdated = null);
 
         Task SyncroniseAsync();
 
