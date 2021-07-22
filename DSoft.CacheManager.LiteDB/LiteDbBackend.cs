@@ -134,9 +134,6 @@ namespace DSoft.CacheManager.LiteDB
         /// <param name="data">The data.</param>
         public void Insert<T>(string keyName, T data)
         {
-            if (!CacheEntryExists(keyName))
-                return;
-
             var col = Database.GetCollection<T>(keyName);
 
             col.Insert(data);

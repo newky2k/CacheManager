@@ -31,7 +31,7 @@ namespace CacheManagerTest
         }
 
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private async void Button_Click(object sender, RoutedEventArgs e)
         {
 
             
@@ -47,6 +47,9 @@ namespace CacheManagerTest
             using (var cacheManager = ServiceHost.GetRequiredService<ICacheManager>())
             {
                 var dataKey = typeof(SomeData).Name;
+
+               await cacheManager.LoadAsync();
+
                 var items = new List<SomeData>()
                 {
                     new SomeData() { Id = 1, Name = "One", IsEnabled = true },
@@ -57,7 +60,14 @@ namespace CacheManagerTest
 
                 var exists = cacheManager.IsKeyRegistered(dataKey);
 
-                cacheManager.SetItems<SomeData>(dataKey, items);
+                if (exists)
+                {
+                    var ogItems = cacheManager.GetItems<SomeData>(dataKey);
+
+                    var count = ogItems.Count;
+                }
+
+                cacheManager.SetItems(dataKey, items);
 
 
                 var itemsOut = cacheManager.GetItems<SomeData>(dataKey);

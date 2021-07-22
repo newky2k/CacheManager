@@ -287,7 +287,7 @@ namespace DSoft.CacheManager
                     ListType = typeof(List<T>).AssemblyQualifiedName,
                 };
 
-                BackEnd.Insert(CacheItemCollectionName, existingItem);
+                BackEnd.Insert(CacheItemCollectionName, newKey);
             }
 
             BackEnd.EnsureIndexed<CacheManagerItem, string>(CacheItemCollectionName, x => x.Key);
