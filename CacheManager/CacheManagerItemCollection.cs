@@ -16,11 +16,13 @@ namespace DSoft.CacheManager
             return (item != null);
         }
 
-        public Task<bool> ContainsKeyAsync(string key)
+        public void AddRange(IEnumerable<CacheManagerItem> items)
         {
-            var item = this.Items.FirstOrDefault(x => x.Key.Equals(key, StringComparison.OrdinalIgnoreCase));
+            if (items == null || !items.Any())
+                return;
 
-            return Task.FromResult(item != null);
+            foreach (var item in items)
+                Add(item);
         }
 
         public CacheManagerItem this[string key]

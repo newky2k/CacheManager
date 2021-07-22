@@ -9,13 +9,22 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Copyright>Copyright © 2021 DSoft</Copyright>
     <Authors>newky2k</Authors>
-    <PackageId>DSoft.CacheManager</PackageId>
-    <Product>DSoft.CacheManager</Product>
+    <PackageId>DSoft.CacheManager.LiteDB</PackageId>
+    <Product>DSoft.CacheManager.LiteDB</Product>
     <PackageProjectUrl>https://github.com/newky2k/cachemanager</PackageProjectUrl>
     <RepositoryUrl>https://github.com/newky2k/cachemanager</RepositoryUrl>
     <RepositoryType>Github</RepositoryType>
     <PackageTags>cache netstandard</PackageTags>
-    <Description>.NET Managed Caching framework using LiteDb as backing storage</Description>
+    <Description>LiteDB backend for DSoft.CacheManager</Description>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="LiteDB.Config" Version="5.0.7" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CacheManager\DSoft.CacheManager.csproj" />
+  </ItemGroup>
 
 </Project>

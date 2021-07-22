@@ -1,13 +1,8 @@
-﻿using CacheManager;
-using LiteDB;
-using Microsoft.Extensions.Options;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DSoft.CacheManager
@@ -17,30 +12,17 @@ namespace DSoft.CacheManager
         private const string CacheItemCollectionName = "CacheItems";
 
         #region Fields
-        private CacheConfiguration _configuration;
-        private LiteDatabase _liteDatabase = null;
         private CacheManagerItemCollection _cachedItems;
         private bool _isLoaded;
         private Dictionary<string, object> _dataDictionary = new Dictionary<string, object>();
         private object getItemLock = new object();
+        private ICacheStorageBackend _backend;
 
         #endregion
 
         #region Properties
 
         #region Private Properties
-        private CacheConfiguration Configuration => _configuration;
-
-        private LiteDatabase Database
-        {
-            get
-            {
-                if (_liteDatabase == null)
-                    _liteDatabase = new LiteDatabase(DatabaseConnectionString);
-
-                return _liteDatabase;
-            }
-        }
 
         private CacheManagerItemCollection Cache
         {
@@ -62,11 +44,18 @@ namespace DSoft.CacheManager
             }
         }
 
-        private string BasePath => _configuration.Location;
 
-        private string StoragePath => Path.Combine(BasePath, Configuration.FileName);
+        private ICacheStorageBackend BackEnd
+        {
+            get
+            {
+                if (_backend == null)
+                    throw new Exception("No backend has been provided");
+                    
 
-        private ConnectionString DatabaseConnectionString => new ConnectionString($"Filename={StoragePath};Password={Configuration.Password}");
+                return _backend;
+            }
+        }
 
         #endregion
 
@@ -74,15 +63,13 @@ namespace DSoft.CacheManager
 
         #region Constructors
 
-        public CacheManager(CacheConfiguration configuration)
+        public CacheManager(ICacheStorageBackend backEndProvider)
         {
-            _configuration = configuration;
+            _backend = backEndProvider;
+
+            _backend.Prepare();
         }
 
-        public CacheManager(IOptions<CacheConfiguration> options) : this(options.Value)
-        {
-
-        }
 
         #endregion
 
@@ -97,6 +84,17 @@ namespace DSoft.CacheManager
         /// </returns>
         public bool IsKeyRegistered(string key) => Cache.ContainsKey(key);
 
+        /// <summary>
+        /// Gets the items from the cache for the specified cache key
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key">The cache key</param>
+        /// <returns></returns>
+        /// <exception cref="Exception">
+        /// No data registered with key: {key} in the CacheManager
+        /// or
+        /// No data registered with key: {key} in the CacheManager
+        /// </exception>
         public List<T> GetItems<T>(string key)
         {
             if (!Cache.ContainsKey(key))
@@ -107,16 +105,13 @@ namespace DSoft.CacheManager
                 lock (getItemLock) //handle double loading
                 {
                     //need to load the data from the database
-                    if (!Database.CollectionExists(key))
+                    if (!BackEnd.CacheEntryExists(key))
                         throw new Exception($"No data registered with key: {key} in the CacheManager");
 
                     if (_dataDictionary.ContainsKey(key) && _dataDictionary[key] != null)
                         return (List<T>)_dataDictionary[key]; //handle check after the first lock has completed
 
-                    var ccol = Database.GetCollection<T>(key);
-
-
-                    var data = ccol.FindAll().ToList();
+                    var data = BackEnd.GetItems<T>(key);
 
                     if (_dataDictionary.ContainsKey(key))
                         _dataDictionary[key] = data;
@@ -129,11 +124,16 @@ namespace DSoft.CacheManager
             return (List<T>)_dataDictionary[key];
         }
 
+        /// <summary>
+        /// Set the cached items for the specified cache key
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key">The key.</param>
+        /// <param name="content">The content.</param>
+        /// <param name="lastUpdated">The last updated.</param>
         public void SetItems<T>(string key, List<T> content, DateTime? lastUpdated = null)
         {
-            var col = Database.GetCollection<T>(key);
-
-            var dTime = (lastUpdated.HasValue) ? lastUpdated : DateTime.Now;
+             var dTime = lastUpdated.HasValue ? lastUpdated : DateTime.Now;
 
             if (!Cache.ContainsKey(key))
             {
@@ -152,10 +152,16 @@ namespace DSoft.CacheManager
             else
                 _dataDictionary.Add(key, content);
 
-            UpdateStoredCache<T>(key, content, dTime.Value);
+            UpdateStoredCache(key, content, dTime.Value);
 
         }
 
+        /// <summary>
+        /// Gets the last updated timestamp for the specified cache key
+        /// </summary>
+        /// <param name="key">The key.</param>
+        /// <returns></returns>
+        /// <exception cref="Exception">No data registered with key: {key} in the CacheManager</exception>
         public DateTime? GetLastUpdated(string key)
         {
             if (!Cache.ContainsKey(key))
@@ -165,7 +171,14 @@ namespace DSoft.CacheManager
 
         }
 
-        public void UpdateContentsLastUpdated(string key, DateTime? lastUpdated = null)
+        /// <summary>
+        /// Updates the cached item last updated timestamp, for the specified cache key
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key">The key.</param>
+        /// <param name="lastUpdated">The last updated.</param>
+        /// <exception cref="Exception">No data registered with key: {key} in the CacheManager</exception>
+        public void UpdateContentsLastUpdated<T>(string key, DateTime? lastUpdated = null)
         {
             if (!Cache.ContainsKey(key))
                 throw new Exception($"No data registered with key: {key} in the CacheManager");
@@ -174,9 +187,13 @@ namespace DSoft.CacheManager
 
             Cache[key].LastUpdated = dTime;
 
-            UpdateCacheKeys(key, dTime.Value);
+            UpdateCacheKeys<T>(key, dTime.Value);
         }
 
+
+        /// <summary>
+        /// Loads the cache asynchronously.
+        /// </summary>
         public async Task LoadAsync()
         {
             await Task.Run(() =>
@@ -188,6 +205,9 @@ namespace DSoft.CacheManager
 
         }
 
+        /// <summary>
+        /// Syncronises the changes to the database, asynchronously.
+        /// </summary>
         public async Task SyncroniseAsync()
         {
             await Task.Run(() =>
@@ -206,20 +226,10 @@ namespace DSoft.CacheManager
 
         }
 
-        public void ResetCache()
-        {
-            try
-            {
-                if (File.Exists(StoragePath))
-                    File.Delete(StoragePath);
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-        }
-
+        /// <summary>
+        /// Resets the cache
+        /// </summary>
+        public void ResetCache() => BackEnd.Reset();
 
         #endregion
 
@@ -227,9 +237,7 @@ namespace DSoft.CacheManager
 
         private CacheManagerItem AddNewKey<T>(string key, DateTime updateTime)
         {
-            var col = Database.GetCollection<CacheManagerItem>(CacheItemCollectionName);
-
-            var existingItem = col.FindOne(x => x.Key.Equals(key));
+            var existingItem = BackEnd.Find<CacheManagerItem>(CacheItemCollectionName, x => x.Key.Equals(key));
 
             if (existingItem != null)
             {
@@ -237,7 +245,7 @@ namespace DSoft.CacheManager
                 existingItem.Type = typeof(T).AssemblyQualifiedName;
                 existingItem.ListType = typeof(List<T>).AssemblyQualifiedName;
 
-                col.Update(existingItem);
+                BackEnd.Update(CacheItemCollectionName, existingItem);
             }
             else
             {
@@ -250,27 +258,24 @@ namespace DSoft.CacheManager
                 };
 
 
-                col.Insert(existingItem);
+                BackEnd.Insert(CacheItemCollectionName, existingItem);
             }
 
-            col.EnsureIndex(x => x.Key);
+            BackEnd.EnsureIndexed<CacheManagerItem, string>(CacheItemCollectionName, x => x.Key);
 
             return existingItem;
 
         }
 
-        private void UpdateCacheKeys(string key, DateTime updateTime)
+        private void UpdateCacheKeys<T>(string key, DateTime updateTime)
         {
-            var col = Database.GetCollection<CacheManagerItem>(CacheItemCollectionName);
-
-
-            var existingItem = col.FindOne(x => x.Key.Equals(key));
+            var existingItem = BackEnd.Find<CacheManagerItem>(CacheItemCollectionName, x => x.Key.Equals(key));
 
             if (existingItem != null)
             {
                 existingItem.LastUpdated = updateTime;
 
-                col.Update(existingItem);
+                BackEnd.Update(CacheItemCollectionName, existingItem);
             }
             else
             {
@@ -278,24 +283,22 @@ namespace DSoft.CacheManager
                 {
                     Key = key,
                     LastUpdated = updateTime,
+                    Type = typeof(T).AssemblyQualifiedName,
+                    ListType = typeof(List<T>).AssemblyQualifiedName,
                 };
 
-                col.Insert(newKey);
+                BackEnd.Insert(CacheItemCollectionName, existingItem);
             }
 
-            col.EnsureIndex(x => x.Key);
+            BackEnd.EnsureIndexed<CacheManagerItem, string>(CacheItemCollectionName, x => x.Key);
         }
 
         private void UpdateStoredCache<T>(string key, List<T> content, DateTime updateTime)
         {
-            UpdateCacheKeys(key, updateTime);
+            UpdateCacheKeys<T>(key, updateTime);
 
-            if (Database.CollectionExists(key))
-                Database.DropCollection(key);
+            BackEnd.SetItems<T>(key, content);
 
-            var ccol = Database.GetCollection<T>(key);
-            ccol.InsertBulk(content);
-            //Database.FileStorage.
         }
 
         private CacheManagerItemCollection LoadCache()
@@ -303,12 +306,10 @@ namespace DSoft.CacheManager
             try
             {
 
-                if (!Directory.Exists(BasePath))
-                    Directory.CreateDirectory(BasePath);
-
+                
                 var items = new CacheManagerItemCollection();
 
-                if (!File.Exists(StoragePath))
+                if (!BackEnd.Exists)
                     return items;
 
                 //load the keys into memory, other items can be loaded as an when
@@ -320,34 +321,36 @@ namespace DSoft.CacheManager
                 {
                     try
                     {
-                        if (!string.IsNullOrWhiteSpace(aKey.ListType))
+                        if (!string.IsNullOrWhiteSpace(aKey.Type))
                         {
-                            var dType = Type.GetType(aKey.ListType);
                             var aType = Type.GetType(aKey.Type);
 
-                            var dList = (IList)Activator.CreateInstance(dType);
+                            var ex = typeof(ICacheStorageBackend);
+                            var mi = ex.GetMethod(nameof(ICacheStorageBackend.GetItems));
+                            var miConstructed = mi.MakeGenericMethod(aType);
+                            
+                            var dList = (IList)miConstructed.Invoke(BackEnd, new object[] { aKey.Key });
 
-                            var count = dList.Count;
+                            ////old way?
+                            //var dList = (IList)Activator.CreateInstance(dType);
 
-                            var col = Database.GetCollection(aKey.Key);
+                            //var count = dList.Count;
 
-                            var mapper = BsonMapper.Global;
+                            //var col = BackEnd.Database.GetCollection(aKey.Key);
 
-                            foreach (var aItem in col.FindAll())
-                            {
-                                var newItem = mapper.ToObject(Type.GetType(aKey.Type), aItem);
+                            //var mapper = BsonMapper.Global;
 
-                                dList.Add(newItem);
-                            }
+                            //foreach (var aItem in col.FindAll())
+                            //{
+                            //    var newItem = mapper.ToObject(Type.GetType(aKey.Type), aItem);
+
+                            //    dList.Add(newItem);
+                            //}
 
                             if (_dataDictionary.ContainsKey(aKey.Key))
-                            {
                                 _dataDictionary[aKey.Key] = dList;
-                            }
                             else
-                            {
                                 _dataDictionary.Add(aKey.Key, dList);
-                            }
 
 
                         }
@@ -377,41 +380,9 @@ namespace DSoft.CacheManager
 
         private void LoadKeys(CacheManagerItemCollection tree)
         {
-            if (!Database.CollectionExists(CacheItemCollectionName))
-                return;
+            var allKeys = BackEnd.GetItems<CacheManagerItem>(CacheItemCollectionName);
 
-            var aCol = Database.GetCollection<CacheManagerItem>(CacheItemCollectionName);
-
-            if (aCol.Count() == 0)
-                return;
-
-            var allKeys = aCol.FindAll();
-
-            foreach (var aKey in allKeys)
-            {
-                tree.Add(aKey);
-
-                //if (!string.IsNullOrWhiteSpace(aKey.ListType))
-                //{
-                //    var dList = (IList)Activator.CreateInstance(Type.GetType(aKey.ListType));
-
-                //    var count = dList.Count;
-
-                //    var col = Database.GetCollection(aKey.Key);
-
-                //    var mapper = BsonMapper.Global;
-
-                //    foreach (var aItem in col.FindAll())
-                //    {
-                //        var newItem = mapper.ToDocument(Type.GetType(aKey.Type));
-
-                //        dList.Add(newItem);
-                //    }
-
-
-                //}
-
-            }
+            tree.AddRange(allKeys);
 
         }
 
@@ -427,6 +398,11 @@ namespace DSoft.CacheManager
                 Console.WriteLine(ex);
 
             }
+        }
+
+        public void Dispose()
+        {
+            _backend = null;
         }
 
         #endregion
