@@ -20,35 +20,28 @@ variables:
   solution: '**/*.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
-  netVersion: '5.0.x'
-  releaseSuffix: '-prerelease'
+  netVersion: '8.0.x'
+  releaseSuffix: ''
 
-name: 1.0.$(date:yyMM).$(date:dd)$(rev:r)
+name: 1.1.$(date:yyMM).$(date:dd)$(rev:r)
 steps:
-- task: UseDotNet@2
-  displayName: Install .Net 5.x
-  inputs:
-    packageType: 'sdk'
-    version: '$(netVersion)'
 
-- task: NuGetCommand@2
-  displayName: Nuget Restore
+- task: DotNetCoreCLI@2
   inputs:
-    restoreSolution: '$(solution)'
+    command: 'restore'
+    projects: '$(solution)'
 
-- task: VSBuild@1
-  displayName: Build Solution
+- task: DotNetCoreCLI@2
+  displayName: dotnet build
   inputs:
-    solution: '$(solution)'
-    msbuildArgs: '/p:Version=$(Build.BuildNumber)$(releaseSuffix) /p:AssemblyVersion=$(Build.BuildNumber) /p:FileVersion=$(Build.BuildNumber)'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-    
+    projects: '$(solution)'
+    arguments: '--configuration=$(buildConfiguration) /p:Platform="$(buildPlatform)" /p:Version=$(Build.BuildNumber)$(releaseSuffix) /p:AssemblyVersion=$(Build.BuildNumber) /p:FileVersion=$(Build.BuildNumber) '
+
 - task: CopyFiles@2
   displayName: Copy Files to $(build.artifactstagingdirectory)
   inputs:
     SourceFolder: '$(system.defaultworkingdirectory)'
-    Contents: '**/Dsoft.*.nupkg'
+    Contents: '**/DSoft.*.nupkg'
     TargetFolder: '$(build.artifactstagingdirectory)'
     flattenFolders: true
 
