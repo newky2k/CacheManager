@@ -1,21 +1,19 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>DSoft.snk</AssemblyOriginatorKeyFile>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Copyright>Copyright © 2021 DSoft</Copyright>
-    <Authors>newky2k</Authors>
-    <PackageId>DSoft.CacheManager</PackageId>
-    <Product>DSoft.CacheManager</Product>
-    <PackageProjectUrl>https://github.com/newky2k/cachemanager</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/newky2k/cachemanager</RepositoryUrl>
-    <RepositoryType>Github</RepositoryType>
-    <PackageTags>cache netstandard</PackageTags>
-    <Description>.NET Managed Caching framework using LiteDb as backing storage</Description>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFrameworks>netstandard2.0; net6.0; net8.0;</TargetFrameworks>
+		<PackageId>DSoft.CacheManager</PackageId>
+		<Product>DSoft.CacheManager</Product>
+		<PackageTags>cache netstandard</PackageTags>
+		<Description>.NET Managed Caching framework using LiteDb as backing storage</Description>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+	</PropertyGroup>
 
+	<ItemGroup>
+		<None Include="../README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0" />
+	</ItemGroup>
 </Project>

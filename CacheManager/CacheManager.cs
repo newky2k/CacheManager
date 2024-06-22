@@ -7,16 +7,16 @@ using System.Threading.Tasks;
 
 namespace DSoft.CacheManager
 {
-    public class CacheManager : ICacheManager
+    internal class CacheManager : ICacheManager
     {
         private const string CacheItemCollectionName = "CacheItems";
 
         #region Fields
         private CacheManagerItemCollection _cachedItems;
-        private bool _isLoaded;
         private Dictionary<string, object> _dataDictionary = new Dictionary<string, object>();
         private object getItemLock = new object();
-        private ICacheStorageBackend _backend;
+        private readonly ICacheStorageBackend _backend;
+        private bool _isLoaded;
 
         #endregion
 
@@ -31,8 +31,6 @@ namespace DSoft.CacheManager
                 if (_cachedItems == null)
                 {
                     _cachedItems = LoadCache();
-
-                    _isLoaded = true;
                 }
 
 
@@ -43,7 +41,6 @@ namespace DSoft.CacheManager
                 _cachedItems = value;
             }
         }
-
 
         private ICacheStorageBackend BackEnd
         {
@@ -58,6 +55,15 @@ namespace DSoft.CacheManager
         }
 
         #endregion
+
+
+        /// <summary>
+        /// Gets a value indicating whether this instance is loaded.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this instance is loaded; otherwise, <c>false</c>.
+        /// </value>
+        public bool IsLoaded => _isLoaded;
 
         #endregion
 
@@ -199,8 +205,6 @@ namespace DSoft.CacheManager
             await Task.Run(() =>
             {
                 Cache = LoadCache();
-
-                _isLoaded = true;
             });
 
         }
@@ -329,23 +333,7 @@ namespace DSoft.CacheManager
                             var mi = ex.GetMethod(nameof(ICacheStorageBackend.GetItems));
                             var miConstructed = mi.MakeGenericMethod(aType);
                             
-                            var dList = (IList)miConstructed.Invoke(BackEnd, new object[] { aKey.Key });
-
-                            ////old way?
-                            //var dList = (IList)Activator.CreateInstance(dType);
-
-                            //var count = dList.Count;
-
-                            //var col = BackEnd.Database.GetCollection(aKey.Key);
-
-                            //var mapper = BsonMapper.Global;
-
-                            //foreach (var aItem in col.FindAll())
-                            //{
-                            //    var newItem = mapper.ToObject(Type.GetType(aKey.Type), aItem);
-
-                            //    dList.Add(newItem);
-                            //}
+                            var dList = (IList)miConstructed.Invoke(BackEnd, [aKey.Key]);
 
                             if (_dataDictionary.ContainsKey(aKey.Key))
                                 _dataDictionary[aKey.Key] = dList;
@@ -364,6 +352,7 @@ namespace DSoft.CacheManager
 
                 }
 
+                _isLoaded  = true;
 
                 return items;
 
@@ -398,11 +387,6 @@ namespace DSoft.CacheManager
                 Console.WriteLine(ex);
 
             }
-        }
-
-        public void Dispose()
-        {
-            _backend = null;
         }
 
         #endregion

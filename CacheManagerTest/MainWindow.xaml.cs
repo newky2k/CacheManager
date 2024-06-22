@@ -33,30 +33,24 @@ namespace CacheManagerTest
 
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
-
-            
-            //var config = new LiteDbStorageOptions()
-            //{
-            //    Location = Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
-            //    FileName = "Settings.db",
-            //    Password = "1234567890",
-            //};
-
-            //var cacheBackend = new LiteDbBackend(config);
-
-            using (var cacheManager = ServiceHost.GetRequiredService<ICacheManager>())
+            try
             {
+                var cacheManager = ServiceHost.GetRequiredService<ICacheManager>();
+
                 var dataKey = typeof(SomeData).Name;
 
-               await cacheManager.LoadAsync();
+                if (!cacheManager.IsLoaded)
+                {
+                    await cacheManager.LoadAsync();
+                }
 
                 var items = new List<SomeData>()
-                {
-                    new SomeData() { Id = 1, Name = "One", IsEnabled = true },
-                    new SomeData() { Id = 2, Name = "Two", IsEnabled = false },
-                    new SomeData() { Id = 3, Name = "Three", IsEnabled = true },
-                    new SomeData() { Id = 4, Name = "Four", IsEnabled = false },
-                };
+                                {
+                                    new SomeData() { Id = 1, Name = "One", IsEnabled = true },
+                                    new SomeData() { Id = 2, Name = "Two", IsEnabled = false },
+                                    new SomeData() { Id = 3, Name = "Three", IsEnabled = true },
+                                    new SomeData() { Id = 4, Name = "Four", IsEnabled = false },
+                                };
 
                 var exists = cacheManager.IsKeyRegistered(dataKey);
 
@@ -74,6 +68,12 @@ namespace CacheManagerTest
 
                 Debug.WriteLine("");
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error", ex.Message);
+            }
+
+
         }
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
