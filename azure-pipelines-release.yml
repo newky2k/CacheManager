@@ -27,6 +27,7 @@ name: 1.1.$(date:yyMM).$(date:dd)$(rev:r)
 steps:
 
 - task: DotNetCoreCLI@2
+  displayName: dotnet restore
   inputs:
     command: 'restore'
     projects: '$(solution)'
