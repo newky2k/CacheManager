@@ -25,10 +25,22 @@ namespace DSoft.CacheManager.LiteDB
         #region Properties
 
 
+        /// <summary>
+        /// Gets the storage path.
+        /// </summary>
+        /// <value>
+        /// The storage path.
+        /// </value>
         public string StoragePath => Path.Combine(_config.Location, _config.FileName);
 
         private ConnectionString DatabaseConnectionString => new ConnectionString($"Filename={StoragePath};Password={_config.Password}");
 
+        /// <summary>
+        /// Gets the database.
+        /// </summary>
+        /// <value>
+        /// The database.
+        /// </value>
         public LiteDatabase Database
         {
             get
@@ -40,6 +52,12 @@ namespace DSoft.CacheManager.LiteDB
             }
         }
 
+        /// <summary>
+        /// Gets a value indicating whether this <see cref="LiteDbBackend"/> is exists.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if exists; otherwise, <c>false</c>.
+        /// </value>
         public bool Exists => File.Exists(StoragePath);
 
         #endregion

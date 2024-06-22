@@ -1,19 +1,22 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net5.0-windows</TargetFramework>
-    <UseWPF>true</UseWPF>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net8.0-windows</TargetFramework>
+		<UseWPF>true</UseWPF>
+		<SignAssembly>false</SignAssembly>
+		<GenerateDocumentationFile>false</GenerateDocumentationFile>
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="DSoft.System.Mvvm.Hosting" Version="2.3.2107.201" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="DSoft.System.Mvvm.Hosting" Version="3.3.2405.241" />
+		<PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\CacheManager\DSoft.CacheManager.csproj" />
-    <ProjectReference Include="..\DSoft.CacheManager.LiteDB\DSoft.CacheManager.LiteDB.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\CacheManager\DSoft.CacheManager.csproj" />
+		<ProjectReference Include="..\DSoft.CacheManager.LiteDB\DSoft.CacheManager.LiteDB.csproj" />
+	</ItemGroup>
 
 </Project>

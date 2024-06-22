@@ -2,6 +2,7 @@
 using DSoft.CacheManager.LiteDB;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
@@ -33,8 +34,7 @@ namespace CacheManagerTest
 
         private void ConfigureServices(IConfiguration configuration, IServiceCollection services)
         {
-            services.AddScoped<ICacheManager, CacheManager>();
-            services.AddTransient<ICacheStorageBackend, LiteDbBackend>();
+            services.RegisterCacheManager<LiteDbBackend>();
 
             services.AddOptions().Configure<LiteDbStorageOptions>(x =>
             {
