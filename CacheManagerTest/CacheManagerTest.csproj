@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
-		<TargetFramework>net8.0-windows</TargetFramework>
+		<TargetFramework>net9.0-windows</TargetFramework>
 		<UseWPF>true</UseWPF>
 		<SignAssembly>false</SignAssembly>
 		<GenerateDocumentationFile>false</GenerateDocumentationFile>
@@ -10,8 +10,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="DSoft.System.Mvvm.Hosting" Version="3.3.2405.241" />
-		<PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+		<PackageReference Include="DSoft.System.Mvvm.Hosting" Version="3.4.2411.191" />
+		<PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>
