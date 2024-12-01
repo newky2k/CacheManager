@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.0; net6.0; net8.0;</TargetFrameworks>
+		<TargetFrameworks>netstandard2.0;net8.0;net9.0;</TargetFrameworks>
 		<PackageId>DSoft.CacheManager.LiteDB</PackageId>
 		<Product>DSoft.CacheManager.LiteDB</Product>
 		<PackageTags>cache netstandard</PackageTags>
@@ -10,8 +10,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="LiteDB.Config" Version="5.0.20.203" />
-		<PackageReference Include="Microsoft.Extensions.Options" Version="8.0.2" />
+		<PackageReference Include="LiteDB.Config" Version="5.0.21.11" />
+		<PackageReference Include="Microsoft.Extensions.Options" Version="9.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>
