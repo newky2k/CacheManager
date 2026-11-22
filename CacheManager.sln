@@ -11,8 +11,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CacheManagerTest", "CacheMa
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".ci", ".ci", "{CEA50409-BE38-48A3-AE43-3CEB56FB6EE1}"
 	ProjectSection(SolutionItems) = preProject
-		azure-pipelines-mergetest.yml = azure-pipelines-mergetest.yml
-		azure-pipelines-release.yml = azure-pipelines-release.yml
 		Directory.Build.props = Directory.Build.props
 		README.md = README.md
 	EndProjectSection
