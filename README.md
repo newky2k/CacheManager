@@ -1,8 +1,8 @@
 # DSoft.CacheManager
-Managed .NET cache management framework for .NET Standard 2.0 and .NET 6 or .NET 8
+Managed .NET cache management framework for .NET Standard 2.0, .NET 8, 9, 10 and 11
 
 ## Features
-	- Works on all platforms that support .NET Standard 2.0, .NET 6 or .NET 8
+	- Works on all platforms that support .NET Standard 2.0, .NET 8, 9, 10 or 11
     - Extendable to add different backends for storing the cached data
 		- LiteDb provider is available with more to come
 	- Designed to work with Microsoft's standard Dependency Injection mechanism

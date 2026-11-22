@@ -3,13 +3,14 @@
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
 		<PackageProjectUrl>https://github.com/newky2k/cachemanager</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/newky2k/cachemanager</RepositoryUrl>
 		<RepositoryType>Github</RepositoryType>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<LangVersion>Latest</LangVersion>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<Copyright>Copyright © 2024 DSoft</Copyright>
+		<Copyright>Copyright © 2026 DSoft</Copyright>
 		<Authors>newky2k</Authors>
 		<NoWarn>1701;1702;CS8002;CS8653;CS8600;CS1591;CS8603;CS8602;CS8765;CS8618;CS8604;</NoWarn>
 	</PropertyGroup>
@@ -28,10 +29,10 @@
 	</PropertyGroup>
 
 	<ItemGroup Condition=" '$(Configuration)'=='Release'">
-		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="11.0.100" PrivateAssets="All" />
 	</ItemGroup>
 
-	<PropertyGroup Condition="'$(TF_BUILD)' == 'true'">
+	<PropertyGroup Condition="'$(TF_BUILD)' == 'true' OR '$(GITHUB_ACTIONS)' == 'true'">
 		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
 	</PropertyGroup>
 
